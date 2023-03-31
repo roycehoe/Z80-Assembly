@@ -1,8 +1,10 @@
 import json
 from functools import partial
+from inspect import EndOfBlock
 from io import DEFAULT_BUFFER_SIZE
 from pathlib import Path
 from typing import Any, Optional
+from uu import encode
 
 from pydantic import BaseModel, Field
 
@@ -138,35 +140,63 @@ def get_pokemon_level(level: int) -> str:
     raise InvalidPokemonLevel
 
 
-# CHAR_ENCODING = {
-#     128: chr(65)
-# }
-CHAR_ENCODING = {}
+def get_encoded_str(raw_str: str) -> list[int]:
+    """Encodes a string to pokemon char encoding format in decimals"""
+    encoded_str: list[int] = []
+    for i in raw_str:
+        for key, value in CHAR_ENCODING.items():
+            if i == value:
+                encoded_str.append(key)
+                continue
+    return encoded_str
 
-for i in range(65, 65 + 26):
-    CHAR_ENCODING[63 + i] = chr(i)
 
-CHAR_ENCODING[154] = "("
-CHAR_ENCODING[155] = ")"
-CHAR_ENCODING[156] = ":"
-CHAR_ENCODING[157] = ";"
-CHAR_ENCODING[158] = "["
-CHAR_ENCODING[159] = "]"
+def get_subset_location(set: list[Any], subset: list[Any]) -> list[int]:
+    subset_locations = []
+    if not all(x in set for x in subset):
+        return None
 
-for i in range(97, 97 + 26):
-    CHAR_ENCODING[160 + i - 97] = chr(i)
+    for i in range(len(set) - len(subset) + 1):
+        if set[i : i + len(subset)] == subset:
+            subset_locations.append(hex(i))
 
-print(CHAR_ENCODING)
+    return subset_locations
 
 
 BEFORE_PATH = "before.dump"
 AFTER_PATH = "after.dump"
+TAKE_FROM = 49152
+TAKE_TO = 57344
 
-# before = list(file_byte_iterator(BEFORE_PATH))
-# after = list(file_byte_iterator(AFTER_PATH))
-# for i in range(len(before)):
-#     if before[i] == 36:
-#         if after[i] == 34:
-#             print(hex(i))
+
+def get_change_in_mem() -> list[str]:
+    changes_in_mem: list[str] = []
+    before = list(file_byte_iterator(BEFORE_PATH))
+    after = list(file_byte_iterator(AFTER_PATH))
+    for i in range(len(before)):
+        if before[i] == 36:
+            if after[i] == 34:
+                return changes_in_mem.append(hex(i))
+    return changes_in_mem
+
+
+def filter_bewteen(int_list: list[int], start: int, end: int) -> list[int]:
+    result = []
+    for i in result:
+        if i > start and i < end:
+            result.append(i)
+    return result
+
 
 FIRST_PARTY_POKEMON_LOCATION = 0xD164
+DUMMY_STRING_LOCATION = 0xD2EC
+FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6
+
+encoded_str = get_encoded_str("KANGASKHAN")
+# encoded_str = get_encoded_str("ONIX")
+# encoded_str = get_encoded_str("PIDGEY")
+# encoded_str = get_encoded_str("PARASECT")
+# encoded_str = get_encoded_str("TENTACOOL")
+set = list(file_byte_iterator(BEFORE_PATH))
+# print(list(map(lambda x: int(x, 16), get_subset_location(set, encoded_str))))
+print(get_subset_location(set, encoded_str))
