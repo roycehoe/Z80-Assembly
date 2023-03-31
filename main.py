@@ -94,6 +94,8 @@ AFTER_PATH = "after.dump"
 before = list(file_byte_iterator(BEFORE_PATH))
 after = list(file_byte_iterator(AFTER_PATH))
 for i in range(len(before)):
-    if before[i] == 36:
-        if after[i] == 24:
-            print(i)
+    if before[i] == 24:
+        if after[i] == 2:
+            print(hex(i))
+
+FIRST_PARTY_POKEMON_LOCATION = 0xD164
