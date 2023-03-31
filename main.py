@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from data import CHAR_ENCODING
+from pokedex import get_pokedex
 
 
 class GameboyMemLocation(Enum):
@@ -100,8 +101,16 @@ def get_change_in_mem(
 FIRST_PARTY_POKEMON_LOCATION = 0xD164
 DUMMY_STRING_LOCATION = 0xD2EC
 FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6  # +10 for subsequent pokemon in party
-LAST_PARTY_LEVEL = (
-    0xF268  # followed by max health. # Subsequent 44 hex belongs to the pokemon somehow
+FIRST_PARTY_FIRST_CONFIG = (
+    0xF18C  # followed by max health. Subsequent 44 hex belongs to the pokemon somehow
 )
+"""
+0xF18C - Level
 
-print(get_change_in_mem())
+Followed by 2 bits. First bit is a 256 multiplier, second bit is the base
+Health
+Attack
+Defence
+Speed
+Special
+"""
