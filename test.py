@@ -13,4 +13,4 @@ def file_byte_iterator(path = './Pokemon_red.dump'):
         for chunk in file_iterator:
             yield from chunk
 
-print(list(file_byte_iterator()))
+print(len(list(file_byte_iterator())))
