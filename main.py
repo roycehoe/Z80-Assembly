@@ -2,6 +2,7 @@ import json
 from functools import partial
 from io import DEFAULT_BUFFER_SIZE
 from pathlib import Path
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -55,7 +56,7 @@ def get_pokedex():
     return Pokedex(pokemon=pokemons)
 
 
-def file_byte_iterator(path="./Pokemon_red.dump"):
+def file_byte_iterator(path):
     """given a path, return an iterator over the file
     that lazily loads the file
     """
@@ -64,9 +65,9 @@ def file_byte_iterator(path="./Pokemon_red.dump"):
         reader = partial(file.read1, DEFAULT_BUFFER_SIZE)
         file_iterator = iter(reader, bytes())
         for chunk in file_iterator:
-            for byte in chunk:
-                yield hex(byte)
-            # yield from chunk
+            # for byte in chunk:
+            #     yield hex(byte)
+            yield from chunk
 
 
 def get_pokemon_level(level: int) -> str:
@@ -76,6 +77,23 @@ def get_pokemon_level(level: int) -> str:
     raise InvalidPokemonLevel
 
 
-CURRENT_PARTY: list[int] = []
+def get_subset_location(set: list[Any], subset: list[Any]) -> Optional[int]:
+    if not all(x in set for x in subset):
+        return None
 
-# print(list(file_byte_iterator()))
+    for i in range(len(set) - len(subset) + 1):
+        if set[i : i + len(subset)] == subset:
+            return i
+
+    return None
+
+
+BEFORE_PATH = "before.dump"
+AFTER_PATH = "after.dump"
+
+before = list(file_byte_iterator(BEFORE_PATH))
+after = list(file_byte_iterator(AFTER_PATH))
+for i in range(len(before)):
+    if before[i] == 36:
+        if after[i] == 24:
+            print(i)
