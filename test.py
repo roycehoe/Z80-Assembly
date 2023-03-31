@@ -1,10 +1,23 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from functools import partial
 from io import DEFAULT_BUFFER_SIZE
 
+
 class InvalidPokemonLevel(Exception):
     pass
+
+@dataclass
+class Pokemon:
+    index: int
+    pokedex_no: str
+    name: str
+    type_1: str
+    type_2: str
+
+@dataclass
+class Pokedex:
+    pokemon: list[Pokemon]
 
 
 def file_byte_iterator(path = './Pokemon_red.dump'):
