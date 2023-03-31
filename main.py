@@ -6,6 +6,67 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
+CHAR_ENCODING = {
+    128: "A",
+    129: "B",
+    130: "C",
+    131: "D",
+    132: "E",
+    133: "F",
+    134: "G",
+    135: "H",
+    136: "I",
+    137: "J",
+    138: "K",
+    139: "L",
+    140: "M",
+    141: "N",
+    142: "O",
+    143: "P",
+    144: "Q",
+    145: "R",
+    146: "S",
+    147: "T",
+    148: "U",
+    149: "V",
+    150: "W",
+    151: "X",
+    152: "Y",
+    153: "Z",
+    154: "(",
+    155: ")",
+    156: ":",
+    157: ";",
+    158: "[",
+    159: "]",
+    160: "a",
+    161: "b",
+    162: "c",
+    163: "d",
+    164: "e",
+    165: "f",
+    166: "g",
+    167: "h",
+    168: "i",
+    169: "j",
+    170: "k",
+    171: "l",
+    172: "m",
+    173: "n",
+    174: "o",
+    175: "p",
+    176: "q",
+    177: "r",
+    178: "s",
+    179: "t",
+    180: "u",
+    181: "v",
+    182: "w",
+    183: "x",
+    184: "y",
+    185: "z",
+}
+
 
 class InvalidPokemonLevel(Exception):
     pass
@@ -77,25 +138,35 @@ def get_pokemon_level(level: int) -> str:
     raise InvalidPokemonLevel
 
 
-def get_subset_location(set: list[Any], subset: list[Any]) -> Optional[int]:
-    if not all(x in set for x in subset):
-        return None
+# CHAR_ENCODING = {
+#     128: chr(65)
+# }
+CHAR_ENCODING = {}
 
-    for i in range(len(set) - len(subset) + 1):
-        if set[i : i + len(subset)] == subset:
-            return i
+for i in range(65, 65 + 26):
+    CHAR_ENCODING[63 + i] = chr(i)
 
-    return None
+CHAR_ENCODING[154] = "("
+CHAR_ENCODING[155] = ")"
+CHAR_ENCODING[156] = ":"
+CHAR_ENCODING[157] = ";"
+CHAR_ENCODING[158] = "["
+CHAR_ENCODING[159] = "]"
+
+for i in range(97, 97 + 26):
+    CHAR_ENCODING[160 + i - 97] = chr(i)
+
+print(CHAR_ENCODING)
 
 
 BEFORE_PATH = "before.dump"
 AFTER_PATH = "after.dump"
 
-before = list(file_byte_iterator(BEFORE_PATH))
-after = list(file_byte_iterator(AFTER_PATH))
-for i in range(len(before)):
-    if before[i] == 24:
-        if after[i] == 2:
-            print(hex(i))
+# before = list(file_byte_iterator(BEFORE_PATH))
+# after = list(file_byte_iterator(AFTER_PATH))
+# for i in range(len(before)):
+#     if before[i] == 36:
+#         if after[i] == 34:
+#             print(hex(i))
 
 FIRST_PARTY_POKEMON_LOCATION = 0xD164
