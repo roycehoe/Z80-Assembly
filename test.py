@@ -1,6 +1,11 @@
+from dataclasses import dataclass
 from pathlib import Path
 from functools import partial
 from io import DEFAULT_BUFFER_SIZE
+
+class InvalidPokemonLevel(Exception):
+    pass
+
 
 def file_byte_iterator(path = './Pokemon_red.dump'):
     """given a path, return an iterator over the file
@@ -11,6 +16,19 @@ def file_byte_iterator(path = './Pokemon_red.dump'):
         reader = partial(file.read1, DEFAULT_BUFFER_SIZE)
         file_iterator = iter(reader, bytes())
         for chunk in file_iterator:
-            yield from chunk
+            for byte in chunk:
+                yield hex(byte)
+            # yield from chunk
 
-print(len(list(file_byte_iterator())))
+def get_pokemon_level(level: int) -> str:
+    """Obtains pokemon level in hex"""
+    if level <= 100:
+        return hex(level)
+    raise InvalidPokemonLevel
+
+
+
+
+CURRENT_PARTY: list[int] = []
+
+print(list(file_byte_iterator()))
