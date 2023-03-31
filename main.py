@@ -2,7 +2,7 @@ from enum import Enum, auto
 from functools import partial
 from io import DEFAULT_BUFFER_SIZE
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from data import CHAR_ENCODING
 
@@ -38,8 +38,11 @@ GAMEBOY_MEM_LOCATION_TO_RANGE_MAP: dict[GameboyMemLocation, range] = {
 }
 
 
-def get_gameboy_mem_location(hex: int):
-    ...
+def get_gameboy_mem_location(hex: int) -> Optional[GameboyMemLocation]:
+    for key, value in GAMEBOY_MEM_LOCATION_TO_RANGE_MAP.items():
+        if hex in value:
+            return key
+    return None
 
 
 def file_byte_iterator(path):
@@ -54,7 +57,7 @@ def file_byte_iterator(path):
             yield from chunk
 
 
-def get_encoded_str(raw_str: str) -> list[int]:
+def get_pokemon_chars(raw_str: str) -> list[int]:
     """Encodes a string to pokemon char encoding format in decimals"""
     encoded_str: list[int] = []
     for i in raw_str:
@@ -79,27 +82,19 @@ def get_subset_location(set: list[Any], subset: list[Any]) -> list[int]:
 
 BEFORE_PATH = "before.dump"
 AFTER_PATH = "after.dump"
-TAKE_FROM = 49152
-TAKE_TO = 57344
 
 
-def get_change_in_mem() -> list[str]:
+def get_change_in_mem(
+    before_path: str = BEFORE_PATH, after_path: str = AFTER_PATH
+) -> list[str]:
     changes_in_mem: list[str] = []
-    before = list(file_byte_iterator(BEFORE_PATH))
-    after = list(file_byte_iterator(AFTER_PATH))
+    before = list(file_byte_iterator(before_path))
+    after = list(file_byte_iterator(after_path))
     for i in range(len(before)):
         if before[i] == 78:
             if after[i] == 96:
                 changes_in_mem.append(hex(i))
     return changes_in_mem
-
-
-def filter_bewteen(int_list: list[int], start: int, end: int) -> list[int]:
-    result = []
-    for i in result:
-        if i > start and i < end:
-            result.append(i)
-    return result
 
 
 FIRST_PARTY_POKEMON_LOCATION = 0xD164
