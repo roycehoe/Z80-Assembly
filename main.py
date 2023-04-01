@@ -53,6 +53,7 @@ def file_byte_iterator(path):
     """
     path = Path(path)
     with path.open("rb") as file:
+        print(file)
         reader = partial(file.read1, DEFAULT_BUFFER_SIZE)
         file_iterator = iter(reader, bytes())
         for chunk in file_iterator:
@@ -124,25 +125,78 @@ class PokemonStats:
         ]
 
 
-class PokemonMod(PokemonStats):
-    FIRST_PARTY_POKEMON_LOCATION = 0xD164  # +1 for subsequent pokemon in party
-    DUMMY_STRING_LOCATION = 0xD2EC
-    FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6  # +10 for subsequent pokemon in party
-    FIRST_PARTY_STATS = 0xF18C  # followed by max health. Subsequent 44 hex belongs to the pokemon somehow
-    NEXT_PARTY_STATS_START = 44
+PartySlot = Literal[0, 1, 2, 3, 4, 5]
 
-    party_slot: Literal[1, 2, 3, 4, 5, 6]
-    index: int
-    name: str
-
-
-FIRST_PARTY_POKEMON_LOCATION = 0xD164  # +1 for subsequent pokemon in party
 DUMMY_STRING_LOCATION = 0xD2EC
+
+NEXT_PARTY_POKEMON_STATS_STEP = 44
+NEXT_PARTY_POKEMON_STATS_STEP = 1
+NEXT_PARTY_POKEMON_NAME_STEP = 10
+
+FIRST_PARTY_POKEMON_INDEX_LOCATION = 0xD164  # +1 for subsequent pokemon in party
 FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6  # +10 for subsequent pokemon in party
-FIRST_PARTY_STATS = (
+FIRST_PARTY_POKEMON_STATS_LOCATION = (
     0xF18C  # followed by max health. Subsequent 44 hex belongs to the pokemon somehow
 )
-NEXT_PARTY_STATS_START = 44
+
+
+def get_moded_party_pokemon(
+    save_file: list[int], party_slot: PartySlot, moded_pokemon_index: int
+):
+    start_mem_location = FIRST_PARTY_POKEMON_INDEX_LOCATION + (
+        NEXT_PARTY_POKEMON_STATS_STEP * party_slot
+    )
+    return [
+        save_file[:start_mem_location],
+        moded_pokemon_index,
+        save_file[1 + start_mem_location :],
+    ]
+
+
+def get_moded_party_pokemon_name(
+    save_file: list[int], party_slot: PartySlot, moded_name: list[int]
+):
+    start_mem_location = FIST_PARTY_POKEMON_NAME_LOCATION + (
+        NEXT_PARTY_POKEMON_NAME_STEP * party_slot
+    )
+    return [
+        save_file[:start_mem_location],
+        moded_name,
+        save_file[NEXT_PARTY_POKEMON_NAME_STEP + start_mem_location :],
+    ]
+
+
+def get_moded_party_pokemon_stats(
+    save_file: list[int], party_slot: PartySlot, moded_stats: PokemonStats
+):
+    start_mem_location = FIRST_PARTY_POKEMON_STATS_LOCATION + (
+        NEXT_PARTY_POKEMON_STATS_STEP * party_slot
+    )
+    return [
+        save_file[:start_mem_location],
+        moded_stats.get_hex(),
+        save_file[NEXT_PARTY_POKEMON_STATS_STEP+ start_mem_location :],
+    ]
+
+
+@dataclass
+class PokemonMod:
+    NEXT_PARTY_STATS_STEP = 44
+    NEXT_PARTY_POKEMON_STEP = 1
+    NEXT_PARTY_NAME_STEP = 10
+
+    FIRST_PARTY_POKEMON_LOCATION = 0xD164
+    FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6
+    FIRST_PARTY_STATS = 0xF18C
+
+    # party_slot:
+    party_slot_location: str
+    pokemon_index: int
+    pokemon_location: int
+    name: str
+    name_location: str
+    stats: list[str]
+    stats_location: str
 
 
 """
