@@ -1,8 +1,9 @@
+from dataclasses import dataclass
 from enum import Enum, auto
 from functools import partial
 from io import DEFAULT_BUFFER_SIZE
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from data import CHAR_ENCODING
 from pokedex import get_pokedex
@@ -98,12 +99,52 @@ def get_change_in_mem(
     return changes_in_mem
 
 
-FIRST_PARTY_POKEMON_LOCATION = 0xD164
+@dataclass
+class PokemonStats:
+    level: int
+    health: int
+    attack: int
+    defence: int
+    speed: int
+    special: int
+
+    def _get_hex(self, stat: int) -> list[str]:
+        first_hex = hex(stat // 256)
+        second_hex = hex(stat % 256)
+        return [first_hex, second_hex]
+
+    def get_hex(self) -> list[str]:
+        return [
+            hex(self.level),
+            *self._get_hex(self.health),
+            *self._get_hex(self.attack),
+            *self._get_hex(self.defence),
+            *self._get_hex(self.speed),
+            *self._get_hex(self.special),
+        ]
+
+
+class PokemonMod(PokemonStats):
+    FIRST_PARTY_POKEMON_LOCATION = 0xD164  # +1 for subsequent pokemon in party
+    DUMMY_STRING_LOCATION = 0xD2EC
+    FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6  # +10 for subsequent pokemon in party
+    FIRST_PARTY_STATS = 0xF18C  # followed by max health. Subsequent 44 hex belongs to the pokemon somehow
+    NEXT_PARTY_STATS_START = 44
+
+    party_slot: Literal[1, 2, 3, 4, 5, 6]
+    index: int
+    name: str
+
+
+FIRST_PARTY_POKEMON_LOCATION = 0xD164  # +1 for subsequent pokemon in party
 DUMMY_STRING_LOCATION = 0xD2EC
 FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6  # +10 for subsequent pokemon in party
-FIRST_PARTY_FIRST_CONFIG = (
+FIRST_PARTY_STATS = (
     0xF18C  # followed by max health. Subsequent 44 hex belongs to the pokemon somehow
 )
+NEXT_PARTY_STATS_START = 44
+
+
 """
 0xF18C - Level
 
