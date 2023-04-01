@@ -3,7 +3,9 @@ from enum import Enum, auto
 from functools import partial
 from io import DEFAULT_BUFFER_SIZE
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Callable, Literal, Optional, Type
+
+from pydantic import BaseModel, conint, constr
 
 from data import CHAR_ENCODING
 from pokedex import get_pokedex
@@ -100,31 +102,23 @@ def get_change_in_mem(
     return changes_in_mem
 
 
-@dataclass
-class PokemonStats:
-    level: int
-    health: int
-    attack: int
-    defence: int
-    speed: int
-    special: int
+PokemonStatsType: Type[int] = conint(gt=0, lt=264)
+
+
+class PokemonStats(BaseModel):
+    level: PokemonStatsType
+    health: PokemonStatsType
+    attack: PokemonStatsType
+    defence: PokemonStatsType
+    speed: PokemonStatsType
+    special: PokemonStatsType
 
     def _get_hex(self, stat: int) -> list[int]:
-        first_hex = stat // 256
-        second_hex = stat % 256
+        first_hex = stat // 256  # 256 multiplier
+        second_hex = stat % 256  # 1 multiplier
         return [first_hex, second_hex]
 
     def get_hex(self) -> list[int]:
-        """
-        0xF18C - Level
-
-        Followed by 2 bits. First bit is a 256 multiplier, second bit is the base
-        Health
-        Attack
-        Defence
-        Speed
-        Special
-        """
         return [
             self.level,
             *self._get_hex(self.health),
@@ -134,8 +128,6 @@ class PokemonStats:
             *self._get_hex(self.special),
         ]
 
-
-PartySlot = Literal[0, 1, 2, 3, 4, 5]
 
 DUMMY_STRING_LOCATION = 0xD2EC
 
@@ -148,22 +140,25 @@ FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6
 FIRST_PARTY_POKEMON_STATS_LOCATION = 0xF18C
 
 
-def get_moded_party_pokemon_index(
+PartySlot = Literal[0, 1, 2, 3, 4, 5]
+
+
+def _get_moded_party_pokemon_index(
     save_file: list[int], party_slot: PartySlot, moded_pokemon_index: int
-):
+) -> list[int]:
     start_mem_location = FIRST_PARTY_POKEMON_INDEX_LOCATION + (
         NEXT_PARTY_POKEMON_INDEX_STEP * party_slot
     )
     return [
-        save_file[:start_mem_location],
+        *save_file[:start_mem_location],
         moded_pokemon_index,
-        save_file[NEXT_PARTY_POKEMON_INDEX_STEP + start_mem_location :],
+        *save_file[NEXT_PARTY_POKEMON_INDEX_STEP + start_mem_location :],
     ]
 
 
-def get_moded_party_pokemon_name(
+def _get_moded_party_pokemon_name(
     save_file: list[int], party_slot: PartySlot, moded_name: str
-):
+) -> list[int]:
     name_in_pokemon_chars = get_pokemon_chars(moded_name)
     while len(name_in_pokemon_chars) <= 10:
         name_in_pokemon_chars.append(0)
@@ -172,22 +167,22 @@ def get_moded_party_pokemon_name(
         NEXT_PARTY_POKEMON_NAME_STEP * party_slot
     )
     return [
-        save_file[:start_mem_location],
-        moded_name,
-        save_file[NEXT_PARTY_POKEMON_NAME_STEP + start_mem_location :],
+        *save_file[:start_mem_location],
+        *name_in_pokemon_chars,
+        *save_file[NEXT_PARTY_POKEMON_NAME_STEP + start_mem_location :],
     ]
 
 
-def get_moded_party_pokemon_stats(
+def _get_moded_party_pokemon_stats(
     save_file: list[int], party_slot: PartySlot, moded_stats: PokemonStats
-):
+) -> list[int]:
     start_mem_location = FIRST_PARTY_POKEMON_STATS_LOCATION + (
         NEXT_PARTY_POKEMON_STATS_STEP * party_slot
     )
     return [
-        save_file[:start_mem_location],
-        moded_stats.get_hex(),
-        save_file[NEXT_PARTY_POKEMON_STATS_STEP + start_mem_location :],
+        *save_file[:start_mem_location],
+        *moded_stats.get_hex(),
+        *save_file[NEXT_PARTY_POKEMON_STATS_STEP + start_mem_location :],
     ]
 
 
@@ -200,7 +195,7 @@ class PokemonMod:
 
 
 def get_moded_party(save_file: list[int], mod: PokemonMod) -> list[int]:
-    res = get_moded_party_pokemon_index(save_file, mod.slot, mod.index)
-    res = get_moded_party_pokemon_name(save_file, mod.slot, mod.name)
-    res = get_moded_party_pokemon_stats(save_file, mod.slot, mod.stats)
+    res = _get_moded_party_pokemon_index(save_file, mod.slot, mod.index)
+    res = _get_moded_party_pokemon_name(save_file, mod.slot, mod.name)
+    res = _get_moded_party_pokemon_stats(save_file, mod.slot, mod.stats)
     return res
