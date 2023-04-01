@@ -5,7 +5,7 @@ from io import DEFAULT_BUFFER_SIZE
 from pathlib import Path
 from typing import Any, Callable, Literal, Optional, Type
 
-from pydantic import BaseModel, conint, constr
+from pydantic import BaseModel, conint, constr, validator
 
 from data import CHAR_ENCODING
 from pokedex import get_pokedex
@@ -186,12 +186,23 @@ def _get_moded_party_pokemon_stats(
     ]
 
 
-@dataclass
-class PokemonMod:
+class InvalidPokemonIndexError(Exception):
+    pass
+
+
+class PokemonMod(BaseModel):
     slot: PartySlot
     index: int
     name: str
     stats: PokemonStats
+
+    @validator("index")
+    def is_valid_pokemon_index(cls, v):
+        pokedex = get_pokedex()
+        pokemon_index = pokedex.get("index", v)
+        if not pokemon_index:
+            raise InvalidPokemonIndexError
+        return v
 
 
 def get_moded_party(save_file: list[int], mod: PokemonMod) -> list[int]:
