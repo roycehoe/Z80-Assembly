@@ -162,16 +162,13 @@ def _get_pokemon_name(name: str) -> list[int]:
     return name_in_pokemon_chars
 
 
-save_file = list(file_byte_iterator("./PokemonRed.sav"))
-
-
 PartySlot = Literal[0, 1, 2, 3, 4, 5]
 
 
 def _get_moded_party_pokemon_index(
     save_file: list[int], party_slot: PartySlot, moded_pokemon_index: int
 ) -> list[int]:
-    start_mem_location = MEM_FIRST_PARTY_POKEMON_INDEX_LOCATION + (
+    start_mem_location = SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION + (
         NEXT_PARTY_POKEMON_INDEX_STEP * party_slot
     )
     return [
@@ -186,7 +183,7 @@ def _get_moded_party_pokemon_name(
 ) -> list[int]:
     name_in_pokemon_chars = _get_pokemon_name(moded_name)
 
-    start_mem_location = MEM_FIST_PARTY_POKEMON_NAME_LOCATION + (
+    start_mem_location = SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION + (
         NEXT_PARTY_POKEMON_NAME_STEP * party_slot
     )
     return [
@@ -199,7 +196,7 @@ def _get_moded_party_pokemon_name(
 def _get_moded_party_pokemon_stats(
     save_file: list[int], party_slot: PartySlot, moded_stats: PokemonStats
 ) -> list[int]:
-    start_mem_location = MEM_FIRST_PARTY_POKEMON_STATS_LOCATION + (
+    start_mem_location = SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION + (
         NEXT_PARTY_POKEMON_STATS_STEP * party_slot
     )
     return [
