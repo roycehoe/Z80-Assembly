@@ -55,7 +55,6 @@ def file_byte_iterator(path):
     """
     path = Path(path)
     with path.open("rb") as file:
-        print(file)
         reader = partial(file.read1, DEFAULT_BUFFER_SIZE)
         file_iterator = iter(reader, bytes())
         for chunk in file_iterator:
@@ -143,9 +142,18 @@ NEXT_PARTY_POKEMON_INDEX_STEP = 44
 NEXT_PARTY_POKEMON_STATS_STEP = 1
 NEXT_PARTY_POKEMON_NAME_STEP = 10
 
-FIRST_PARTY_POKEMON_INDEX_LOCATION = 0xD164
-FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6
-FIRST_PARTY_POKEMON_STATS_LOCATION = 0xF18C
+# MEMORY
+MEM_FIRST_PARTY_POKEMON_INDEX_LOCATION = 0xD164
+MEM_FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6
+MEM_FIRST_PARTY_POKEMON_STATS_LOCATION = 0xF18C
+
+# SAVE FILE
+
+SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION = None
+SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION = None
+SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION = 0x2F55
+
+save_file = list(file_byte_iterator("./PokemonRed.sav"))
 
 
 PartySlot = Literal[0, 1, 2, 3, 4, 5]
@@ -154,7 +162,7 @@ PartySlot = Literal[0, 1, 2, 3, 4, 5]
 def _get_moded_party_pokemon_index(
     save_file: list[int], party_slot: PartySlot, moded_pokemon_index: int
 ) -> list[int]:
-    start_mem_location = FIRST_PARTY_POKEMON_INDEX_LOCATION + (
+    start_mem_location = MEM_FIRST_PARTY_POKEMON_INDEX_LOCATION + (
         NEXT_PARTY_POKEMON_INDEX_STEP * party_slot
     )
     return [
@@ -171,7 +179,7 @@ def _get_moded_party_pokemon_name(
     while len(name_in_pokemon_chars) <= 10:
         name_in_pokemon_chars.append(0)
 
-    start_mem_location = FIST_PARTY_POKEMON_NAME_LOCATION + (
+    start_mem_location = MEM_FIST_PARTY_POKEMON_NAME_LOCATION + (
         NEXT_PARTY_POKEMON_NAME_STEP * party_slot
     )
     return [
@@ -184,7 +192,7 @@ def _get_moded_party_pokemon_name(
 def _get_moded_party_pokemon_stats(
     save_file: list[int], party_slot: PartySlot, moded_stats: PokemonStats
 ) -> list[int]:
-    start_mem_location = FIRST_PARTY_POKEMON_STATS_LOCATION + (
+    start_mem_location = MEM_FIRST_PARTY_POKEMON_STATS_LOCATION + (
         NEXT_PARTY_POKEMON_STATS_STEP * party_slot
     )
     return [
