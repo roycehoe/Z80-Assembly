@@ -62,6 +62,14 @@ def file_byte_iterator(path):
             yield from chunk
 
 
+def _is_valid_pokemon_char(letter: str) -> bool:
+    """Encodes a string to pokemon char encoding format in decimals"""
+    for key, value in CHAR_ENCODING.items():
+        if letter == value:
+            return True
+    return False
+
+
 def get_pokemon_chars(raw_str: str) -> list[int]:
     """Encodes a string to pokemon char encoding format in decimals"""
     encoded_str: list[int] = []
@@ -190,6 +198,10 @@ class InvalidPokemonIndexError(Exception):
     pass
 
 
+class InvalidPokemonCharacterError(Exception):
+    pass
+
+
 class PokemonMod(BaseModel):
     slot: PartySlot
     index: int
@@ -202,6 +214,13 @@ class PokemonMod(BaseModel):
         pokemon_index = pokedex.get("index", v)
         if not pokemon_index:
             raise InvalidPokemonIndexError
+        return v
+
+    @validator("name")
+    def is_valid_pokemon_name(cls, v):
+        for letter in v:
+            if not _is_valid_pokemon_char(letter):
+                raise InvalidPokemonCharacterError
         return v
 
 
