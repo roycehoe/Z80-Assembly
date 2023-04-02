@@ -153,7 +153,22 @@ SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION = None
 SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION = None
 SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION = 0x2F55
 
+
+def _get_pokemon_name(name: str) -> list[int]:
+    name_in_pokemon_chars = get_pokemon_chars(name)
+    while len(name_in_pokemon_chars) <= 10:
+        name_in_pokemon_chars.append(0)
+    return name_in_pokemon_chars
+
+
 save_file = list(file_byte_iterator("./PokemonRed.sav"))
+subset = get_pokemon_chars("MOLTRES")
+
+subset_location = get_subset_location(save_file, subset)
+print(subset_location)
+# print(0x2F55)
+# print(0xE2)
+# print(save_file[0x2F55 : 0x2F55 + 100])
 
 
 PartySlot = Literal[0, 1, 2, 3, 4, 5]
@@ -175,9 +190,7 @@ def _get_moded_party_pokemon_index(
 def _get_moded_party_pokemon_name(
     save_file: list[int], party_slot: PartySlot, moded_name: str
 ) -> list[int]:
-    name_in_pokemon_chars = get_pokemon_chars(moded_name)
-    while len(name_in_pokemon_chars) <= 10:
-        name_in_pokemon_chars.append(0)
+    name_in_pokemon_chars = _get_pokemon_name(moded_name)
 
     start_mem_location = MEM_FIST_PARTY_POKEMON_NAME_LOCATION + (
         NEXT_PARTY_POKEMON_NAME_STEP * party_slot
