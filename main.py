@@ -144,7 +144,7 @@ NEXT_PARTY_POKEMON_NAME_STEP = 10
 
 # MEMORY
 MEM_FIRST_PARTY_POKEMON_INDEX_LOCATION = 0xD164
-MEM_FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B6
+MEM_FIST_PARTY_POKEMON_NAME_LOCATION = 0xF2B5
 MEM_FIRST_PARTY_POKEMON_STATS_LOCATION = 0xF18C
 
 # SAVE FILE
@@ -163,11 +163,14 @@ def _get_pokemon_name(name: str) -> list[int]:
 
 
 save_file = list(file_byte_iterator("./PokemonRed.sav"))
-subset = _get_pokemon_name("MOLTRES")
-print(len(subset))
+subset = get_pokemon_chars("MOLTRES")
+# print(subset)
+# print(len(subset))
 
-# subset_location = get_subset_location(save_file, subset)
+subset_location = get_subset_location(save_file, subset)
 # print(subset_location)
+print(subset)
+print(save_file[0x59A : 0x59A + 100])
 # print(0x2F55)
 # print(0xE2)
 # print(save_file[0x2F55 : 0x2F55 + 100])
