@@ -26,7 +26,9 @@ def _get_pokemon_bases(pokedex_path: str = POKEDEX_PATH) -> list[PokemonBase]:
     path = Path(pokedex_path)
     with path.open("r") as file:
         pokemon_file = json.load(file)
-        for i in range(0, len(pokemon_file) - 1):
+        for i in range(
+            0, len(pokemon_file) - 1
+        ):  # cleans dirty data in pokedex.json file
             current_pokemon = pokemon_file[i]
             next_pokemon = pokemon_file[i]
             if _is_missingno_info(current_pokemon):

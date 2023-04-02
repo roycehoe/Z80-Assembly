@@ -7,16 +7,21 @@ from typing import Any, Callable, Literal, Optional, Type
 
 from pydantic import BaseModel, conint, constr, validator
 
-from constants import (AFTER_PATH, BEFORE_PATH, CHAR_ENCODING,
-                       GAMEBOY_MEM_LOCATION_TO_RANGE_MAP,
-                       NEXT_PARTY_POKEMON_INDEX_STEP,
-                       NEXT_PARTY_POKEMON_NAME_STEP,
-                       NEXT_PARTY_POKEMON_STATS_STEP,
-                       SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION,
-                       SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION,
-                       SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION,
-                       GameboyMemLocation)
+from constants import (
+    AFTER_PATH,
+    BEFORE_PATH,
+    CHAR_ENCODING,
+    GAMEBOY_MEM_LOCATION_TO_RANGE_MAP,
+    NEXT_PARTY_POKEMON_INDEX_STEP,
+    NEXT_PARTY_POKEMON_NAME_STEP,
+    NEXT_PARTY_POKEMON_STATS_STEP,
+    SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION,
+    SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION,
+    SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION,
+    GameboyMemLocation,
+)
 from pokedex import get_pokedex
+from schemas.PokemonStats import PokemonStats
 
 
 def get_gameboy_mem_location(hex: int) -> Optional[GameboyMemLocation]:
@@ -80,34 +85,6 @@ def get_change_in_mem(
             if after[i] == 96:
                 changes_in_mem.append(hex(i))
     return changes_in_mem
-
-
-PokemonStatsType: Type[int] = conint(gt=0, lt=264)
-
-
-class PokemonStats(BaseModel):
-    level: PokemonStatsType
-    health: PokemonStatsType
-    attack: PokemonStatsType
-    defence: PokemonStatsType
-    speed: PokemonStatsType
-    special: PokemonStatsType
-
-    def _get_hex(self, stat: int) -> list[int]:
-        first_hex = stat // 256  # 256 multiplier
-        second_hex = stat % 256  # 1 multiplier
-        return [first_hex, second_hex]
-
-    def get_hex(self) -> list[int]:
-        return [
-            self.level,
-            *self._get_hex(self.health),
-            *self._get_hex(self.attack),
-            *self._get_hex(self.defence),
-            *self._get_hex(self.speed),
-            *self._get_hex(self.special),
-        ]
-
 
 
 def _get_pokemon_name(name: str) -> list[int]:
