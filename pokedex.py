@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from constants import POKEDEX_PATH
-from schemas.pokedex import Pokedex, Pokemon, PokemonBase
+from schemas.Pokedex import Pokedex, Pokemon, PokemonBase
 
 
 class InvalidPokemonLevel(Exception):
