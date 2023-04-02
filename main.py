@@ -158,7 +158,7 @@ def _get_pokemon_name(name: str) -> list[int]:
     """Pokemon names are stored in memory within exactly 10 hexadecimals"""
     name_in_pokemon_chars = get_pokemon_chars(name)
     while len(name_in_pokemon_chars) < 10:
-        name_in_pokemon_chars.append(0)
+        name_in_pokemon_chars.append(50)
     return name_in_pokemon_chars
 
 
@@ -168,7 +168,7 @@ subset = get_pokemon_chars("MOLTRES")
 # print(len(subset))
 
 subset_location = get_subset_location(save_file, subset)
-# print(subset_location)
+print(subset_location)
 print(subset)
 print(save_file[0x59A : 0x59A + 100])
 # print(0x2F55)
