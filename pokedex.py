@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from constants import POKEDEX_PATH
 from schemas.pokedex import Pokedex, Pokemon, PokemonBase
 
 
@@ -19,9 +20,10 @@ def get_pokemon_level(level: int) -> str:
     raise InvalidPokemonLevel
 
 
-def get_pokedex():
-    path = Path("./pokedex.json")
-    pokemons: list[Pokemon] = []
+def _get_pokemon_bases(pokedex_path: str = POKEDEX_PATH) -> list[PokemonBase]:
+    pokemon_base: list[PokemonBase] = []
+
+    path = Path(pokedex_path)
     with path.open("r") as file:
         pokemon_file = json.load(file)
         for i in range(0, len(pokemon_file) - 1):
@@ -31,8 +33,15 @@ def get_pokedex():
                 continue
             if _is_missingno_info(next_pokemon):
                 current_pokemon["Pokemon"] += next_pokemon["Pokemon"]
-            pokemon_base = PokemonBase(**current_pokemon)
-            pokemon = Pokemon(**pokemon_base.dict(), hex=hex(pokemon_base.index))
-            pokemons.append(pokemon)
+            pokemon = PokemonBase(**current_pokemon)
+            pokemon_base.append(pokemon)
+    return pokemon_base
 
-    return Pokedex(pokemon=pokemons)
+
+def get_pokedex():
+    pokemon_base = _get_pokemon_bases()
+    pokedex_pokemon = [
+        Pokemon(**pokemon_base.dict(), hex=hex(pokemon_base.index))
+        for pokemon_base in pokemon_base
+    ]
+    return Pokedex(pokemon=pokedex_pokemon)
