@@ -7,7 +7,8 @@ from typing import Any, Callable, Literal, Optional, Type
 
 from pydantic import BaseModel, conint, constr, validator
 
-from constants import (CHAR_ENCODING, GAMEBOY_MEM_LOCATION_TO_RANGE_MAP,
+from constants import (AFTER_PATH, BEFORE_PATH, CHAR_ENCODING,
+                       GAMEBOY_MEM_LOCATION_TO_RANGE_MAP,
                        NEXT_PARTY_POKEMON_INDEX_STEP,
                        NEXT_PARTY_POKEMON_NAME_STEP,
                        NEXT_PARTY_POKEMON_STATS_STEP,
