@@ -8,7 +8,7 @@ from typing import Any, Callable, Literal, Optional, Type
 from pydantic import BaseModel, conint, constr, validator
 
 from data import CHAR_ENCODING
-from pokedex import get_pokedex
+from pokedex import Pokedex, get_pokedex
 
 
 class GameboyMemLocation(Enum):
@@ -149,7 +149,7 @@ MEM_FIRST_PARTY_POKEMON_STATS_LOCATION = 0xF18C
 
 # SAVE FILE
 
-SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION = None
+SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION = 0x2F2D
 SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION = 0x307E
 SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION = 0x2F55
 
@@ -163,18 +163,6 @@ def _get_pokemon_name(name: str) -> list[int]:
 
 
 save_file = list(file_byte_iterator("./PokemonRed.sav"))
-moltres = _get_pokemon_name("MOLTRES")
-dratini = _get_pokemon_name("DRATINI")
-
-print(dratini)
-# subset_location = get_subset_location(save_file, moltres)
-# print(subset_location)
-# print(subset)
-# print(save_file[0x59A : 0x59A + 100])
-print(save_file[0x307E : 0x307E + 100])
-# print(0x2F55)
-# print(0xE2)
-# print(save_file[0x2F55 : 0x2F55 + 100])
 
 
 PartySlot = Literal[0, 1, 2, 3, 4, 5]
