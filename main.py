@@ -150,27 +150,28 @@ MEM_FIRST_PARTY_POKEMON_STATS_LOCATION = 0xF18C
 # SAVE FILE
 
 SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION = None
-SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION = None
+SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION = 0x307E
 SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION = 0x2F55
 
 
 def _get_pokemon_name(name: str) -> list[int]:
     """Pokemon names are stored in memory within exactly 10 hexadecimals"""
     name_in_pokemon_chars = get_pokemon_chars(name)
-    while len(name_in_pokemon_chars) < 10:
-        name_in_pokemon_chars.append(50)
+    while len(name_in_pokemon_chars) <= 10:
+        name_in_pokemon_chars.append(0x50)  # blank chars are filled with 0x50 in mem
     return name_in_pokemon_chars
 
 
 save_file = list(file_byte_iterator("./PokemonRed.sav"))
-subset = get_pokemon_chars("MOLTRES")
-# print(subset)
-# print(len(subset))
+moltres = _get_pokemon_name("MOLTRES")
+dratini = _get_pokemon_name("DRATINI")
 
-subset_location = get_subset_location(save_file, subset)
-print(subset_location)
-print(subset)
-print(save_file[0x59A : 0x59A + 100])
+print(dratini)
+# subset_location = get_subset_location(save_file, moltres)
+# print(subset_location)
+# print(subset)
+# print(save_file[0x59A : 0x59A + 100])
+print(save_file[0x307E : 0x307E + 100])
 # print(0x2F55)
 # print(0xE2)
 # print(save_file[0x2F55 : 0x2F55 + 100])
