@@ -139,6 +139,9 @@ def _get_moded_party_pokemon_stats(
     ]
 
 
+PLAYER_PARTY_MAX_POKEMON = 6
+
+
 class InvalidPokemonIndexError(Exception):
     pass
 
@@ -147,7 +150,11 @@ class InvalidPokemonCharacterError(Exception):
     pass
 
 
-class PokemonMod(BaseModel):
+class InvalidPokemonPartySize(Exception):
+    pass
+
+
+class PlayerPartyMod(BaseModel):
     slot: PartySlot
     index: int
     name: str
@@ -169,7 +176,17 @@ class PokemonMod(BaseModel):
         return v
 
 
-def get_moded_party(save_file: list[int], mod: PokemonMod) -> list[int]:
+class PlayerPartyModIn(BaseModel):
+    data: list[PlayerPartyMod]
+
+    @validator("data")
+    def is_valid_pokemon_party_size(cls, v):
+        if len(v) > PLAYER_PARTY_MAX_POKEMON:
+            raise InvalidPokemonPartySize
+        return v
+
+
+def get_moded_party(save_file: list[int], mod: PlayerPartyMod) -> list[int]:
     res = _get_moded_party_pokemon_index(save_file, mod.slot, mod.index)
     res = _get_moded_party_pokemon_name(save_file, mod.slot, mod.name)
     res = _get_moded_party_pokemon_stats(save_file, mod.slot, mod.stats)
