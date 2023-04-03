@@ -9,7 +9,7 @@ from constants import (
     SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION,
     SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION,
 )
-from schemas.PokemonPartyModIn import PlayerPartyMod
+from schemas.PokemonPartyModIn import PlayerPartyMod, PlayerPartyModIn
 from schemas.PokemonStats import PokemonStats
 from utils.byte_processor import file_byte_iterator, get_pokemon_chars
 
@@ -76,14 +76,16 @@ def get_moded_party(save_file: list[int], mod: PlayerPartyMod) -> list[int]:
 def write_moded_party(
     save_template_location: str,
     output_location: str,
-    mod: PlayerPartyMod,
+    mod_parties_config: PlayerPartyModIn,
     moded_party_func: Callable[
         [list[int], PlayerPartyMod], list[int]
     ] = get_moded_party,
 ):
     save_file = list(file_byte_iterator(save_template_location))
-    moded_party = moded_party_func(save_file, mod)
+    for mod_party_config in mod_parties_config.data:
+        moded_party = moded_party_func(save_file, mod_party_config)
+
     path = Path(output_location)
-    with path.open("w") as file:
-        ...
+    with path.open("wb") as file:
+        file.write(bytes(moded_party))
     return
