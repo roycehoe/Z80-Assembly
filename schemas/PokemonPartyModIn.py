@@ -2,12 +2,11 @@ from typing import Literal
 
 from pydantic import BaseModel, validator
 
-from constants import CHAR_ENCODING
+from constants import CHAR_ENCODING, PLAYER_PARTY_MAX_POKEMON
 from pokedex import get_pokedex
 from schemas.PokemonStats import PokemonStats
 
 PartySlot = Literal[0, 1, 2, 3, 4, 5]
-PLAYER_PARTY_MAX_POKEMON = 6
 
 
 def _is_valid_pokemon_char(letter: str) -> bool:

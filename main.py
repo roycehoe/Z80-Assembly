@@ -15,12 +15,14 @@ from constants import (
     NEXT_PARTY_POKEMON_INDEX_STEP,
     NEXT_PARTY_POKEMON_NAME_STEP,
     NEXT_PARTY_POKEMON_STATS_STEP,
+    PLAYER_PARTY_MAX_POKEMON,
     SAVE_FILE_FIRST_PARTY_POKEMON_INDEX_LOCATION,
     SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION,
     SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION,
     GameboyMemLocation,
 )
 from pokedex import get_pokedex
+from schemas.PokemonPartyModIn import PlayerPartyMod
 from schemas.PokemonStats import PokemonStats
 
 
@@ -41,14 +43,6 @@ def file_byte_iterator(path):
         file_iterator = iter(reader, bytes())
         for chunk in file_iterator:
             yield from chunk
-
-
-def _is_valid_pokemon_char(letter: str) -> bool:
-    """Encodes a string to pokemon char encoding format in decimals"""
-    for key, value in CHAR_ENCODING.items():
-        if letter == value:
-            return True
-    return False
 
 
 def get_pokemon_chars(raw_str: str) -> list[int]:
@@ -137,53 +131,6 @@ def _get_moded_party_pokemon_stats(
         *moded_stats.get_hex(),
         *save_file[NEXT_PARTY_POKEMON_STATS_STEP + start_mem_location :],
     ]
-
-
-PLAYER_PARTY_MAX_POKEMON = 6
-
-
-class InvalidPokemonIndexError(Exception):
-    pass
-
-
-class InvalidPokemonCharacterError(Exception):
-    pass
-
-
-class InvalidPokemonPartySize(Exception):
-    pass
-
-
-class PlayerPartyMod(BaseModel):
-    slot: PartySlot
-    index: int
-    name: str
-    stats: PokemonStats
-
-    @validator("index")
-    def is_valid_pokemon_index(cls, v):
-        pokedex = get_pokedex()
-        pokemon_index = pokedex.get("index", v)
-        if not pokemon_index:
-            raise InvalidPokemonIndexError
-        return v
-
-    @validator("name")
-    def is_valid_pokemon_name(cls, v):
-        for letter in v:
-            if not _is_valid_pokemon_char(letter):
-                raise InvalidPokemonCharacterError
-        return v
-
-
-class PlayerPartyModIn(BaseModel):
-    data: list[PlayerPartyMod]
-
-    @validator("data")
-    def is_valid_pokemon_party_size(cls, v):
-        if len(v) > PLAYER_PARTY_MAX_POKEMON:
-            raise InvalidPokemonPartySize
-        return v
 
 
 def get_moded_party(save_file: list[int], mod: PlayerPartyMod) -> list[int]:
