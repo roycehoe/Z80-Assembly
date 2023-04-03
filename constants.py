@@ -1,7 +1,4 @@
 from enum import Enum, auto
-from typing import Literal, Type
-
-from pydantic import conint
 
 
 class GameboyMemLocation(Enum):
