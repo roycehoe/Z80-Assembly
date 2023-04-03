@@ -11,7 +11,6 @@ PLAYER_PARTY_MAX_POKEMON = 6
 
 
 def _is_valid_pokemon_char(letter: str) -> bool:
-    """Encodes a string to pokemon char encoding format in decimals"""
     for key, value in CHAR_ENCODING.items():
         if letter == value:
             return True
