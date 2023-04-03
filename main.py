@@ -1,4 +1,5 @@
-from typing import Literal
+from pathlib import Path
+from typing import Callable, Literal
 
 from constants import (
     NEXT_PARTY_POKEMON_INDEX_STEP,
@@ -10,18 +11,18 @@ from constants import (
 )
 from schemas.PokemonPartyModIn import PlayerPartyMod
 from schemas.PokemonStats import PokemonStats
-from utils.byte_processor import get_pokemon_chars
+from utils.byte_processor import file_byte_iterator, get_pokemon_chars
+
+BLANK_POKEMON_CHAR = 0x50
+PartySlot = Literal[0, 1, 2, 3, 4, 5]
 
 
 def _get_pokemon_name(name: str) -> list[int]:
     """Pokemon names are stored in memory within exactly 10 hexadecimals"""
     name_in_pokemon_chars = get_pokemon_chars(name)
     while len(name_in_pokemon_chars) <= 10:
-        name_in_pokemon_chars.append(0x50)  # blank chars are filled with 0x50 in mem
+        name_in_pokemon_chars.append(BLANK_POKEMON_CHAR)
     return name_in_pokemon_chars
-
-
-PartySlot = Literal[0, 1, 2, 3, 4, 5]
 
 
 def _get_moded_party_pokemon_index(
@@ -70,3 +71,19 @@ def get_moded_party(save_file: list[int], mod: PlayerPartyMod) -> list[int]:
     res = _get_moded_party_pokemon_name(save_file, mod.slot, mod.name)
     res = _get_moded_party_pokemon_stats(save_file, mod.slot, mod.stats)
     return res
+
+
+def write_moded_party(
+    save_template_location: str,
+    output_location: str,
+    mod: PlayerPartyMod,
+    moded_party_func: Callable[
+        [list[int], PlayerPartyMod], list[int]
+    ] = get_moded_party,
+):
+    save_file = list(file_byte_iterator(save_template_location))
+    moded_party = moded_party_func(save_file, mod)
+    path = Path(output_location)
+    with path.open("w") as file:
+        ...
+    return
