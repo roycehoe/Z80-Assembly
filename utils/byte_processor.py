@@ -55,13 +55,16 @@ def get_subset_location(set: list[Any], subset: list[Any]) -> list[int]:
 
 
 def get_change_in_mem(
-    before_path: str = BEFORE_PATH, after_path: str = AFTER_PATH
+    before_value: int,
+    after_value: int,
+    before_path: str = BEFORE_PATH,
+    after_path: str = AFTER_PATH,
 ) -> list[str]:
     changes_in_mem: list[str] = []
     before = list(file_byte_iterator(before_path))
     after = list(file_byte_iterator(after_path))
     for i in range(len(before)):
-        if before[i] == 78:
-            if after[i] == 96:
+        if before[i] == before_value:
+            if after[i] == after_value:
                 changes_in_mem.append(hex(i))
     return changes_in_mem
