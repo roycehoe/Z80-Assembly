@@ -10,7 +10,7 @@ class InvalidPokemonLevel(Exception):
 
 
 def _is_missingno_info(pokemon: dict):
-    return pokemon["Index"] is None
+    return pokemon.get("Index") is None
 
 
 def get_pokemon_level(level: int) -> str:
