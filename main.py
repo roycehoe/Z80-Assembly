@@ -9,12 +9,15 @@ from constants import (
     SAVE_FILE_FIRST_PARTY_POKEMON_STATS_LOCATION,
     SAVE_FILE_FIST_PARTY_POKEMON_NAME_LOCATION,
 )
-from schemas.PokemonPartyModIn import PlayerPartyMod, PlayerPartyModIn
-from schemas.PokemonStats import PokemonStats
+from schemas.PokemonPartyModIn import (
+    PartySlot,
+    PlayerPartyMod,
+    PlayerPartyModIn,
+    PokemonStats,
+)
 from utils.byte_processor import file_byte_iterator, get_pokemon_chars
 
 BLANK_POKEMON_CHAR = 0x50
-PartySlot = Literal[0, 1, 2, 3, 4, 5]
 
 
 def _get_pokemon_name(name: str) -> list[int]:
