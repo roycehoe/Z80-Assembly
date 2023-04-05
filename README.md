@@ -1,8 +1,12 @@
-# Z80-Assembly
+# Introduction
 
-A project to learn assembly
+A project to learn assembly by creating my own pokemon save file
 
 # Getting started
 
-Install the latest version of z80 [here](http://wwwhomes.uni-bielefeld.de/achim/z80-asm.html) and follow the instructions.
-You might need to create directories in your usr/bin/man should installation of manuals fail
+[There is no getting started]
+
+# Non-project accomplishments
+
+- Disassemble a pokemon game and save file by monitoring how bytes change between different states, and generally messing around
+- Use a GUI debugger to watch changes in memory (All debuggers I used previously were CLI debuggers. Go figure)
